@@ -46,6 +46,7 @@ trigger:
 
 action:
   - choose:
+      # Timer finished - turn off the light
       - conditions:
           - condition: trigger
             id: timer
@@ -53,6 +54,8 @@ action:
           - service: light.turn_off
             target:
               entity_id: !input entity_target
+      
+      # Motion detected - turn on light and cancel timer
       - conditions:
           - condition: trigger
             id: motion
@@ -66,6 +69,8 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
+      
+      # Motion stopped while light is on - start timer
       - conditions:
           - condition: trigger
             id: motion
@@ -79,6 +84,8 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
+      
+      # Light turned on externally - start timer
       - conditions:
           - condition: trigger
             id: light
@@ -91,6 +98,8 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
+      
+      # Light turned off externally - cancel timer
       - conditions:
           - condition: trigger
             id: light
