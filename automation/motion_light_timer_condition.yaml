@@ -10,7 +10,6 @@ blueprint:
         entity:
           domain: binary_sensor
           device_class: motion
-          multiple: false
     entity_condition:
       name: Condition
       selector:
@@ -18,20 +17,17 @@ blueprint:
           domain:
             - binary_sensor
             - input_boolean
-          multiple: false
     entity_target:
       name: Light
       selector:
         entity:
           domain: light
-          multiple: false
     timer_no_motion:
       name: Wait timer
       description: Time to leave the light on after last motion is detected.
       selector:
         entity:
           domain: timer
-          multiple: false
 
 # If motion is detected within the delay,
 # we restart the script.
