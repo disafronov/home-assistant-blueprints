@@ -12,7 +12,7 @@ blueprint:
           domain: binary_sensor
           device_class: motion
     entity_target:
-      name: Light
+      name: Motion Light
       description: Light entity to control
       selector:
         entity:
