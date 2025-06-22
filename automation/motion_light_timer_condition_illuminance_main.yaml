@@ -90,10 +90,6 @@ action:
           - service: light.turn_off
             target:
               entity_id: !input entity_target
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - timer finished; Action: light turned off."
       
       # Motion detected + motion light is off + illuminance below threshold + main light is off - turn on motion light
       - conditions:
@@ -115,10 +111,6 @@ action:
           - service: light.turn_on
             target:
               entity_id: !input entity_target
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - motion started at dark; Action: light turned on."
       
       # Motion detected + motion light is on + main light is off - cancel timer
       - conditions:
@@ -137,10 +129,6 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - motion started at light; Action: timer cancelled."
       
       # Motion stopped + motion light is on + main light is off - start timer
       - conditions:
@@ -159,10 +147,6 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - motion stopped at light; Action: timer started."
       
       # Motion light turned on externally - start timer
       - conditions:
@@ -177,10 +161,6 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - light started manually; Action: timer started."
       
       # Motion light turned off externally - cancel timer
       - conditions:
@@ -193,10 +173,6 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - light stopped; Action: timer cancelled"
       
       # Main light turned on - turn off motion light and cancel timer
       - conditions:
@@ -212,7 +188,3 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
-          - service: logbook.log
-            data_template:
-              name: "Blueprint #"
-              message: "Condition: trigger - main light started; Action: light stopped, timer cancelled"
