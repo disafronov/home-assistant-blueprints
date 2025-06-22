@@ -2,7 +2,7 @@ blueprint:
   name: Motion-activated Light with Timer, Condition and Main Light
   description: Turn on a light when motion is detected and turn it off when "no-motion" timer finishes on specific condition
   domain: automation
-  source_url: https://github.com/DmitriySafronov/home-assistant_blueprints/blob/master/automation/motion_light_timer_condition_main.yaml
+  source_url: https://github.com/disafronov/home-assistant_blueprints/blob/master/automation/motion_light_timer_condition_main.yaml
   input:
     entity_trigger:
       name: Motion Sensor
