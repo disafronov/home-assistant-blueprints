@@ -1,8 +1,8 @@
 blueprint:
   name: '"Binary sensor"-activated Light with Timer, Condition and Illuminance'
-  description: 'Turn on a light when binary sensor is "true" and turn it off when "cooldown" timer finishes on specific condifion on specific illuminance'
+  description: 'Turn on a light when binary sensor is "true" and turn it off when "cooldown" timer finishes on specific condition and when ambient light is below threshold'
   domain: automation
-  source_url: https://github.com/DmitriySafronov/home-assistant_blueprints/blob/master/automation/binary_light_timer_condition_illuminance.yaml
+  source_url: https://github.com/disafronov/home-assistant_blueprints/blob/master/automation/binary_light_timer_condition_illuminance.yaml
   input:
     entity_trigger:
       name: Binary Sensor
@@ -32,7 +32,7 @@ blueprint:
             - input_boolean
           multiple: false
     entity_target:
-      name: Light
+      name: Binary Light
       selector:
         entity:
           domain: light
@@ -72,6 +72,7 @@ condition:
 
 action:
   - choose:
+      # Timer finished - turn off the binary light
       - conditions:
           - condition: trigger
             id: timer
@@ -79,6 +80,8 @@ action:
           - service: light.turn_off
             target:
               entity_id: !input entity_target
+      
+      # Binary sensor detected + binary light is off + illuminance below threshold - turn on binary light
       - conditions:
           - condition: trigger
             id: binary
@@ -95,6 +98,8 @@ action:
           - service: light.turn_on
             target:
               entity_id: !input entity_target
+      
+      # Binary sensor detected + binary light is on - cancel timer
       - conditions:
           - condition: trigger
             id: binary
@@ -108,6 +113,8 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_cooldown
+      
+      # Binary sensor stopped + binary light is on - start timer
       - conditions:
           - condition: trigger
             id: binary
@@ -121,18 +128,8 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_cooldown
-      # - conditions:
-      #     - condition: trigger
-      #       id: light
-      #     - condition: state
-      #       entity_id: !input entity_target
-      #       state: "on"
-      #     - condition: template
-      #       value_template: "{{ trigger.to_state.context.parent_id == none }}"
-      #   sequence:
-      #     - service: timer.start
-      #       target:
-      #         entity_id: !input timer_cooldown
+      
+      # Binary light turned off externally - cancel timer
       - conditions:
           - condition: trigger
             id: light
@@ -141,5 +138,19 @@ action:
             state: "off"
         sequence:
           - service: timer.cancel
+            target:
+              entity_id: !input timer_cooldown
+      
+      # Binary light turned on externally - start timer
+      - conditions:
+          - condition: trigger
+            id: light
+          - condition: state
+            entity_id: !input entity_target
+            state: "on"
+          - condition: template
+            value_template: "{{ trigger.to_state.context.id != context.id }}"
+        sequence:
+          - service: timer.start
             target:
               entity_id: !input timer_cooldown
