@@ -73,6 +73,9 @@ action:
           - condition: state
             entity_id: !input entity_target
             state: "on"
+          - condition: state
+            entity_id: !input timer_no_motion
+            state: "idle"
         sequence:
           - service: timer.start
             target:
@@ -84,7 +87,11 @@ action:
             entity_id: !input entity_target
             state: "on"
           - condition: template
-            value_template: "{{ trigger.to_state.context.parent_id == none }}"
+            value_template: >
+              {{ trigger.to_state.context.id != context.id }}
+          - condition: state
+            entity_id: !input timer_no_motion
+            state: "idle"
         sequence:
           - service: timer.start
             target:
