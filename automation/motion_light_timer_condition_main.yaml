@@ -1,17 +1,19 @@
 blueprint:
   name: Motion-activated Light with Timer, Condition and Main Light
-  description: Turn on a light when motion is detected and turn it off when "no-motion" timer finishes on specific condifion
+  description: Turn on a light when motion is detected and turn it off when "no-motion" timer finishes on specific condition
   domain: automation
   source_url: https://github.com/DmitriySafronov/home-assistant_blueprints/blob/master/automation/motion_light_timer_condition_main.yaml
   input:
     entity_trigger:
       name: Motion Sensor
+      description: Binary sensor that detects motion
       selector:
         entity:
           domain: binary_sensor
           device_class: motion
     entity_condition:
       name: Condition
+      description: Binary sensor or input boolean to enable/disable automation
       selector:
         entity:
           domain:
@@ -19,6 +21,7 @@ blueprint:
             - input_boolean
     entity_target:
       name: Motion Light
+      description: Light entity to control
       selector:
         entity:
           domain: light
@@ -30,6 +33,7 @@ blueprint:
           domain: timer
     entity_light_main:
       name: Main Light
+      description: Main light entity that takes priority over motion light
       selector:
         entity:
           domain: light
@@ -65,6 +69,7 @@ condition:
 
 action:
   - choose:
+      # Timer finished - turn off the motion light
       - conditions:
           - condition: trigger
             id: timer
@@ -72,6 +77,8 @@ action:
           - service: light.turn_off
             target:
               entity_id: !input entity_target
+      
+      # Motion detected + main light is off + motion light is off - turn on motion light
       - conditions:
           - condition: trigger
             id: motion
@@ -81,13 +88,33 @@ action:
           - condition: state
             entity_id: !input entity_light_main
             state: "off"
+          - condition: state
+            entity_id: !input entity_target
+            state: "off"
         sequence:
           - service: light.turn_on
             target:
               entity_id: !input entity_target
+      
+      # Motion detected + main light is off + motion light is on - cancel timer
+      - conditions:
+          - condition: trigger
+            id: motion
+          - condition: state
+            entity_id: !input entity_trigger
+            state: "on"
+          - condition: state
+            entity_id: !input entity_light_main
+            state: "off"
+          - condition: state
+            entity_id: !input entity_target
+            state: "on"
+        sequence:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
+      
+      # Motion stopped + motion light is on + main light is off - start timer
       - conditions:
           - condition: trigger
             id: motion
@@ -104,6 +131,8 @@ action:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
+      
+      # Motion light turned on externally - start timer
       - conditions:
           - condition: trigger
             id: light
@@ -111,11 +140,13 @@ action:
             entity_id: !input entity_target
             state: "on"
           - condition: template
-            value_template: "{{ trigger.to_state.context.parent_id == none }}"
+            value_template: "{{ trigger.to_state.context.id != context.id }}"
         sequence:
           - service: timer.start
             target:
               entity_id: !input timer_no_motion
+      
+      # Motion light turned off externally - cancel timer
       - conditions:
           - condition: trigger
             id: light
@@ -126,6 +157,8 @@ action:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
+      
+      # Main light turned on - turn off motion light and cancel timer
       - conditions:
           - condition: trigger
             id: light_main
