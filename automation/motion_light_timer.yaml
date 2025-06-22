@@ -55,17 +55,32 @@ action:
             target:
               entity_id: !input entity_target
       
-      # Motion detected - turn on light and cancel timer
+      # Motion detected while light is off - turn on light
       - conditions:
           - condition: trigger
             id: motion
           - condition: state
             entity_id: !input entity_trigger
             state: "on"
+          - condition: state
+            entity_id: !input entity_target
+            state: "off"
         sequence:
           - service: light.turn_on
             target:
               entity_id: !input entity_target
+      
+      # Motion detected while light is on - cancel timer
+      - conditions:
+          - condition: trigger
+            id: motion
+          - condition: state
+            entity_id: !input entity_trigger
+            state: "on"
+          - condition: state
+            entity_id: !input entity_target
+            state: "on"
+        sequence:
           - service: timer.cancel
             target:
               entity_id: !input timer_no_motion
