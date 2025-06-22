@@ -1,6 +1,6 @@
 blueprint:
   name: Motion-activated Light with Timer and Condition & Illuminance
-  description: Turn on a light when motion is detected and turn it off when "no-motion" timer finishes on specific condition
+  description: Turn on a light when motion is detected and turn it off when "no-motion" timer finishes on specific condition and when ambient light is below threshold
   domain: automation
   source_url: https://github.com/DmitriySafronov/home-assistant_blueprints/blob/master/automation/motion_light_timer_condition_illuminance.yaml
   input:
@@ -81,7 +81,7 @@ action:
             target:
               entity_id: !input entity_target
       
-      # Motion detected + light is off + illuminance below threshold - turn on light
+      # Motion detected + motion light is off + illuminance below threshold - turn on motion light
       - conditions:
           - condition: trigger
             id: motion
@@ -99,7 +99,7 @@ action:
             target:
               entity_id: !input entity_target
       
-      # Motion detected + light is on - cancel timer
+      # Motion detected + motion light is on - cancel timer
       - conditions:
           - condition: trigger
             id: motion
@@ -114,7 +114,7 @@ action:
             target:
               entity_id: !input timer_no_motion
       
-      # Motion stopped + light is on - start timer
+      # Motion stopped + motion light is on - start timer
       - conditions:
           - condition: trigger
             id: motion
@@ -129,7 +129,7 @@ action:
             target:
               entity_id: !input timer_no_motion
       
-      # Light turned on externally - start timer
+      # Motion light turned on externally - start timer
       - conditions:
           - condition: trigger
             id: light
@@ -143,7 +143,7 @@ action:
             target:
               entity_id: !input timer_no_motion
       
-      # Light turned off externally - cancel timer
+      # Motion light turned off externally - cancel timer
       - conditions:
           - condition: trigger
             id: light
