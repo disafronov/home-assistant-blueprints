@@ -6,19 +6,22 @@ blueprint:
   input:
     entity_trigger:
       name: Motion Sensor
+      description: Binary sensor that detects motion
       selector:
         entity:
           domain: binary_sensor
           device_class: motion
     entity_condition:
       name: Condition
+      description: Binary sensor or input boolean to enable/disable automation
       selector:
         entity:
           domain:
             - binary_sensor
             - input_boolean
     entity_target:
-      name: Light
+      name: Motion Light
+      description: Light entity to control
       selector:
         entity:
           domain: light
