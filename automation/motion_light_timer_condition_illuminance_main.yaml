@@ -156,7 +156,7 @@ action:
             entity_id: !input entity_target
             state: "on"
           - condition: template
-            value_template: "{{ trigger.to_state.context.id != context.id }}"
+            value_template: "{{ trigger.to_state.context.user_id is not none }}"
         sequence:
           - service: timer.start
             target:
